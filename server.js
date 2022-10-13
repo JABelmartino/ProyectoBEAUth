@@ -19,6 +19,14 @@ const flash = require('express-flash')
 const session = require('express-session')
 const initializePassport = require('./passport.config')
 const methodOverride = require('method-override')
+const yargs = require('yargs/yargs')(process.argv.slice(2))
+const args = yargs.default(
+{
+  port: 8080
+})
+.argv
+
+console.log(args)
 
 initializePassport(passport,
          email => users.find(user => user.email === email),
@@ -42,7 +50,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
 
-httpServer.listen(8080, () =>{
+httpServer.listen(args, () =>{
     console.log(httpServer.address().port)
 })
 httpServer.on('error', err => console.log(err))
@@ -57,6 +65,11 @@ routerProductos.get('/', checkAuthenticated, async (req, res) => {
 
 routerProductos.get('/login', checkNotAuthenticated, async (req, res) => {
    res.render('login') 
+})
+
+
+routerProductos.get('/info', checkNotAuthenticated, async (req, res) => {
+  res.render('info') 
 })
 
 routerProductos.post('/login', checkNotAuthenticated, passport.authenticate('local',{
