@@ -13,6 +13,8 @@ const bcrypt = require('bcrypt')
 const passport = require('passport')
 const app = express()
 const routerProductos = Router()
+const routerNum = Router()
+
 const httpServer = new HTTPServer(app)
 const io = new IOServer(httpServer)
 const flash = require('express-flash')
@@ -31,16 +33,16 @@ console.log(args)
 initializePassport(passport,
          email => users.find(user => user.email === email),
          id => users.find(user => user.id === id)
-)
-
-
-app.set('views','./views')
-app.set('view engine', 'ejs')
-
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
-app.use(express.static('public'));
-app.use(flash())
+         )
+         
+         
+         app.set('views','./views')
+         app.set('view engine', 'ejs')
+         
+         app.use(express.json())
+         app.use(express.urlencoded({extended: true}))
+         app.use(express.static('public'));
+         app.use(flash())
 app.use(session({
   secret: process.env.SESSION_SECRET ,
   resave: false,
@@ -51,26 +53,28 @@ app.use(passport.session())
 app.use(methodOverride('_method'))
 
 httpServer.listen(args, () =>{
-    console.log(httpServer.address().port)
+  console.log(httpServer.address().port)
 })
 httpServer.on('error', err => console.log(err))
 
 const users = []
 ///-Productos-///
 
+/*
 routerProductos.get('/', checkAuthenticated, async (req, res) => {
     /*const productos = await contenedor.getProductos()*/
-    res.render('index'/*, {formulario: productos}*/) 
-})
-
+  /*  res.render('index'/*, {formulario: productos}) 
+  })
+  
 routerProductos.get('/login', checkNotAuthenticated, async (req, res) => {
-   res.render('login') 
+  res.render('login') 
 })
 
 
 routerProductos.get('/info', checkNotAuthenticated, async (req, res) => {
   res.render('info') 
 })
+
 
 routerProductos.post('/login', checkNotAuthenticated, passport.authenticate('local',{
 successRedirect: '/',
@@ -98,7 +102,7 @@ routerProductos.get('/register', async (req, res) => {
    
 res.render('register') 
 })
-
+*/
 /*
 io.on('connection', async (socket) =>{
     const productos =  await contenedor.getProductos()
@@ -128,6 +132,13 @@ io.on('connection', async (socket) =>{
     }) 
 })*/
 
+
+
+
+
+
+/*
+
 routerProductos.delete('/logout', function(req, res, next) {
   req.logout(function(err) {
     if (err) { return next(err); }
@@ -150,10 +161,34 @@ function checkNotAuthenticated(req, res, next) {
   next()
 } 
 
-app.use('/', routerProductos)
+app.use('/', routerProductos)*/
+
+const { fork } = require('child_process')
+
+let visitas = 0
+routerNum.get('/calcular', async (req, res) => {
+  
+})
 
 
+  httpServer.on('request', (req, res) => {
+    let { url } = req
+    if(url === '/calcular'){
+        const computo = fork('./computo.js')
+        computo.send('start')
+        computo.on('message', mensaje => {
+            console.log(mensaje)
+            res.end(mensaje)
+        })
+        
+       
+    }else if(url === '/'){        
+        res.end(`Ok ${++visitas}`)
+    }
+})
 
+
+app.use('/', routerNum)
 
 
 
