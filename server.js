@@ -14,7 +14,8 @@ const passport = require('passport')
 const app = express()
 const routerProductos = Router()
 const routerNum = Router()
-
+const logger = require('log4js')
+const compression = require('compression')
 const httpServer = new HTTPServer(app)
 const io = new IOServer(httpServer)
 const flash = require('express-flash')
@@ -51,6 +52,7 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
+//app.use(compression())
 
 httpServer.listen(args, () =>{
   console.log(httpServer.address().port)
@@ -65,17 +67,23 @@ routerProductos.get('/', checkAuthenticated, async (req, res) => {
     /*const productos = await contenedor.getProductos()*/
   /*  res.render('index'/*, {formulario: productos}) 
   })
-  
+ 
 routerProductos.get('/login', checkNotAuthenticated, async (req, res) => {
   res.render('login') 
 })
-
-
-routerProductos.get('/info', checkNotAuthenticated, async (req, res) => {
-  res.render('info') 
+*/
+const data = ('holaque tal').repeat(100000)
+routerProductos.get('/info', async (req, res) => {
+  
+  res.send(data) 
 })
 
+routerProductos.get('/infozip', compression(), async (req, res) => {
+  
+  res.send(data) 
+})
 
+/*
 routerProductos.post('/login', checkNotAuthenticated, passport.authenticate('local',{
 successRedirect: '/',
 failureRedirect: 'login',
@@ -102,7 +110,7 @@ routerProductos.get('/register', async (req, res) => {
    
 res.render('register') 
 })
-*/
+
 /*
 io.on('connection', async (socket) =>{
     const productos =  await contenedor.getProductos()
@@ -160,21 +168,18 @@ function checkNotAuthenticated(req, res, next) {
   }
   next()
 } 
-
-app.use('/', routerProductos)*/
+*/
+app.use('/', routerProductos)
 
 const { fork } = require('child_process')
 
 let visitas = 0
-routerNum.get('/calcular', async (req, res) => {
-  
-})
 
-
+routerNum.get('/randoms/:cant', async (req, res) => {
   httpServer.on('request', (req, res) => {
     let { url } = req
     if(url === '/calcular'){
-        const computo = fork('./computo.js')
+        const computo = fork('computo.js')
         computo.send('start')
         computo.on('message', mensaje => {
             console.log(mensaje)
@@ -186,8 +191,7 @@ routerNum.get('/calcular', async (req, res) => {
         res.end(`Ok ${++visitas}`)
     }
 })
-
-
+})
 app.use('/', routerNum)
 
 
