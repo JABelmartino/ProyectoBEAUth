@@ -75,12 +75,7 @@ routerProductos.get('/login', checkNotAuthenticated, async (req, res) => {
 const data = ('holaque tal').repeat(100000)
 routerProductos.get('/info', async (req, res) => {
   
-  res.send(data) 
-})
-
-routerProductos.get('/infozip', compression(), async (req, res) => {
-  
-  res.send(data) 
+  res.render('info')
 })
 
 /*
@@ -170,7 +165,7 @@ function checkNotAuthenticated(req, res, next) {
 } 
 */
 app.use('/', routerProductos)
-
+/*
 const { fork } = require('child_process')
 
 let visitas = 0
@@ -194,5 +189,5 @@ routerNum.get('/randoms/:cant', async (req, res) => {
 })
 app.use('/', routerNum)
 
-
+*/
 

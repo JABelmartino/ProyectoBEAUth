@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "autocannon": "^7.10.0",
     "bcrypt": "^5.1.0",
     "compression": "^1.7.4",
     "dotenv": "^16.0.3",
@@ -21,8 +22,8 @@
     "yargs": "^17.6.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "test": "node benchmark.js",
+    "start": "0x server.js"
   },
   "keywords": [],
   "author": "",
