@@ -8,186 +8,55 @@ const Contenedor = require("./contenedor");
 const contenedor = new Contenedor('./productos.txt')
 const contenedor2 = new Contenedor('./mensajes.txt')
 const {Server: HTTPServer} = require('http')
-const {Server: IOServer} = require('socket.io')
 const bcrypt = require('bcrypt')
 const passport = require('passport')
 const app = express()
-const routerProductos = Router()
-const routerNum = Router()
 const logger = require('log4js')
-const compression = require('compression')
 const httpServer = new HTTPServer(app)
-const io = new IOServer(httpServer)
 const flash = require('express-flash')
 const session = require('express-session')
 const initializePassport = require('./passport.config')
 const methodOverride = require('method-override')
-const yargs = require('yargs/yargs')(process.argv.slice(2))
-const args = yargs.default(
-{
-  port: 8080
-})
-.argv
+const connectionDB = require('./config.js')
+connectionDB()
+const connectionDBs = require('./config.js')
+connectionDBs()
 
-console.log(args)
 
-initializePassport(passport,
-         email => users.find(user => user.email === email),
-         id => users.find(user => user.id === id)
-         )
-         
-         
-         app.set('views','./views')
-         app.set('view engine', 'ejs')
-         
-         app.use(express.json())
-         app.use(express.urlencoded({extended: true}))
-         app.use(express.static('public'));
-         app.use(flash())
-app.use(session({
-  secret: process.env.SESSION_SECRET ,
-  resave: false,
-  saveUninitialized: false 
-}))
-app.use(passport.initialize())
-app.use(passport.session())
-app.use(methodOverride('_method'))
-//app.use(compression())
-
-httpServer.listen(args, () =>{
+httpServer.listen(8080, () =>{
   console.log(httpServer.address().port)
 })
 httpServer.on('error', err => console.log(err))
 
-const users = []
-///-Productos-///
-
-/*
-routerProductos.get('/', checkAuthenticated, async (req, res) => {
-    /*const productos = await contenedor.getProductos()*/
-  /*  res.render('index'/*, {formulario: productos}) 
-  })
- 
-routerProductos.get('/login', checkNotAuthenticated, async (req, res) => {
-  res.render('login') 
-})
-*/
-const data = ('holaque tal').repeat(100000)
-routerProductos.get('/info', async (req, res) => {
+  app.set('views','./views')
+  app.set('view engine', 'ejs')
   
-  res.render('info')
-})
-
-/*
-routerProductos.post('/login', checkNotAuthenticated, passport.authenticate('local',{
-successRedirect: '/',
-failureRedirect: 'login',
-failureFlash: true
+  app.use(express.json())
+  app.use(express.urlencoded({extended: true}))
+  app.use(express.static('public'));
+  app.use(flash())
+app.use(session({
+secret: process.env.SESSION_SECRET ,
+resave: false,
+saveUninitialized: false 
 }))
 
-routerProductos.post('/register', checkNotAuthenticated, async (req, res) => {
-  try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10)
-    users.push({
-      id: Date.now().toString(),
-      name: req.body.name,
-      email: req.body.email,
-      password: hashedPassword
-    })
-    res.redirect('login')
-  } catch (err) {
-    res.redirect('register')
-  }
-  console.log(users)
-})
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(methodOverride('_method'))
 
-routerProductos.get('/register', async (req, res) => {
-   
-res.render('register') 
-})
+const routerProductos = require('./routes/rutasProductosMongo.js')
+const routerCarrito = require('./routes/rutasCarritoMongo.js')
+const routerLogin = require('./routes/rutaslogin.js')
 
-/*
-io.on('connection', async (socket) =>{
-    const productos =  await contenedor.getProductos()
-    socket.emit('mensaje-servidor', {productos} )
-    socket.on('mensaje-nuevo', (productoNuevo) =>{
-        productos.push(productoNuevo)
-        contenedor.postProducto(productoNuevo)
-      const listNueva = {
-        mensaje: 'ok',   
-        productos
-      }
-      io.sockets.emit('mensaje-servidor', listNueva)
-    }) 
-})
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.use(express.static('public'));
 
-io.on('connection', async (socket) =>{
-    const mensajes =  await contenedor.getMensajes()
-    socket.emit('mensaje-servidor2', {mensajes})
-    socket.on('mensaje-nuevo2', (mensajeNuevo) =>{
-        mensajes.push(mensajeNuevo)
-        contenedor.postMensaje(mensajeNuevo)
-      const listMensaje = {
-        mensaje: 'ok',   
-        mensajes
-      }
-      io.sockets.emit('mensaje-servidor2', listMensaje)
-    }) 
-})*/
+app.use('/productos', routerProductos)
+app.use('/carrito', routerCarrito)
+app.use('/', routerLogin)
 
-
-
-
-
-
-/*
-
-routerProductos.delete('/logout', function(req, res, next) {
-  req.logout(function(err) {
-    if (err) { return next(err); }
-    res.redirect('/login');
-  });
-});
-
-function checkAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next()
-  }
-
-  res.redirect('/login')
-}
-
-function checkNotAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return res.redirect('/')
-  }
-  next()
-} 
-*/
 app.use('/', routerProductos)
-/*
-const { fork } = require('child_process')
 
-let visitas = 0
-
-routerNum.get('/randoms/:cant', async (req, res) => {
-  httpServer.on('request', (req, res) => {
-    let { url } = req
-    if(url === '/calcular'){
-        const computo = fork('computo.js')
-        computo.send('start')
-        computo.on('message', mensaje => {
-            console.log(mensaje)
-            res.end(mensaje)
-        })
-        
-       
-    }else if(url === '/'){        
-        res.end(`Ok ${++visitas}`)
-    }
-})
-})
-app.use('/', routerNum)
-
-*/
 

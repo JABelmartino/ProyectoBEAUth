@@ -12,6 +12,7 @@
     "knex": "^2.3.0",
     "log4js": "^6.7.0",
     "method-override": "^3.0.0",
+    "mongoose": "^6.7.1",
     "mysql": "^2.18.1",
     "node": "^18.5.0",
     "nodemon": "^2.0.19",
@@ -22,8 +23,8 @@
     "yargs": "^17.6.0"
   },
   "scripts": {
-    "test": "node benchmark.js",
-    "start": "0x server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
